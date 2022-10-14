@@ -10,6 +10,7 @@ class RegisterRoutes {
     }
 
     config(): void {
+        this.router.get('/', registerController.logon)
         this.router.get('/', registerController.list);
         this.router.get('/:id', registerController.getOne);
         this.router.post('/', registerController.create);

@@ -16,14 +16,16 @@ const database_1 = __importDefault(require("../database"));
 class RegisterController {
     list(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
-            const register = yield database_1.default.query('SELECT * FROM register');
+            const register = yield database_1.default.query("SELECT * FROM register");
             res.json(register);
         });
     }
     getOne(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             const { id } = req.params;
-            const register = yield database_1.default.query('SELECT * FROM register WHERE id = ?', [id]);
+            const register = yield database_1.default.query("SELECT * FROM register WHERE id = ?", [
+                id,
+            ]);
             if (register.length > 0) {
                 return res.json(register[0]);
             }
@@ -32,22 +34,39 @@ class RegisterController {
     }
     create(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
-            yield database_1.default.query('INSERT INTO register set ?', [req.body]);
-            res.json({ text: 'register Saved' });
+            let data = yield database_1.default.query("SELECT * FROM register WHERE email = ?", [req.body.email]);
+            if (Object.keys(data).length === 0) {
+                yield database_1.default.query("INSERT INTO register set ?", [req.body]);
+                res.status(200).json({ msg: 'Usuário Registrado' });
+            }
+            else if (Object.keys(data).length !== 0) {
+                res.status(422).json({ error: 'E-mail já cadastrado. Tente Logar.' });
+            }
+        });
+    }
+    logon(req, res) {
+        return __awaiter(this, void 0, void 0, function* () {
+            let data = yield database_1.default.query("SELECT * FROM register WHERE email = ?", [req.body.email]);
+            if (Object.keys(data).length === 0) {
+                res.send('Logon realizado');
+            }
+            else {
+                res.status(422).json({ error: 'ERRO' });
+            }
         });
     }
     delete(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             const { id } = req.params;
-            yield database_1.default.query('DELETE FROM register WHERE id = ?', [id]);
-            res.json({ message: 'register was deleted' });
+            yield database_1.default.query("DELETE FROM register WHERE id = ?", [id]);
+            res.json({ message: "register was deleted" });
         });
     }
     update(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             const { id } = req.params;
-            yield database_1.default.query('UPDATE register set ? WHERE id = ?', [req.body, id]);
-            res.json({ message: 'register Updated' });
+            yield database_1.default.query("UPDATE register set ? WHERE id = ?", [req.body, id]);
+            res.json({ message: "register Updated" });
         });
     }
 }

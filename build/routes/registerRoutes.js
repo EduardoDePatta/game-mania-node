@@ -11,6 +11,7 @@ class RegisterRoutes {
         this.config();
     }
     config() {
+        this.router.get('/', registerController_1.default.logon);
         this.router.get('/', registerController_1.default.list);
         this.router.get('/:id', registerController_1.default.getOne);
         this.router.post('/', registerController_1.default.create);

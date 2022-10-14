@@ -2,7 +2,7 @@ export default {
     database: {
         host: 'localhost',
         user: 'root',
-        password: 'SUASENHAAQUI',
+        password: 'vip12345',
         database: 'ng_products_db'
     }
 }
