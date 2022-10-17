@@ -37,7 +37,6 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const database_1 = __importDefault(require("../database"));
 const bcrypt = __importStar(require("bcrypt"));
-const jwt = __importStar(require("jsonwebtoken"));
 class RegisterController {
     list(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
@@ -59,114 +58,59 @@ class RegisterController {
     }
     saveUser(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
-            const blacklist = [
-                {
-                    'form': 'SELECT * FROM register'
-                },
-                {
-                    'form': 'SELECT * FROM register WHERE id = ?'
-                },
-                {
-                    'form': '? OR 1=1'
-                },
-                {
-                    'form': 'INSERT INTO'
-                },
-                {
-                    'form': 'DROP TABLE register'
-                },
-                {
-                    'form': 'DROP TABLE products'
-                },
-                {
-                    'form': 'funcionou1234567'
-                }
-            ];
-            for (let i = 0; i < blacklist.length; i++) {
-                if (req.body.email == blacklist[i].form || req.body.password == blacklist[i].form) {
-                    return res.status(500).json({ msg: 'Impossivel registrar agora. Tente novamente mais tarde.' });
-                }
-            }
             let { email, password } = req.body;
-            let data = yield database_1.default.query("SELECT * FROM register WHERE email = ?", [
-                req.body.email,
-            ]);
+            let data = yield database_1.default.query("SELECT * FROM register WHERE email = ?", [req.body.email]);
             const passwordHash = yield bcrypt.hash(password, 8);
             const user = {
                 email,
-                password: passwordHash,
+                password: passwordHash
             };
             if (!email) {
-                return res
-                    .status(422)
-                    .json({ err: "Obrigatório preencher o campo EMAIL" });
+                return res.status(422).json({ err: 'Obrigatório preencher o campo EMAIL' });
             }
             if (!password) {
-                return res
-                    .status(422)
-                    .json({ err: "Obrigatório preencher o campo SENHA" });
+                return res.status(422).json({ err: 'Obrigatório preencher o campo SENHA' });
             }
             if (Object.keys(data).length === 0) {
                 yield database_1.default.query("INSERT INTO register SET ?", [user]);
             }
             else {
-                res.status(422).json({ err: "Usuário já cadastrado" });
+                res.status(422).json({ err: 'Usuário já cadastrado' });
             }
         });
     }
-    login(req, res) {
+    auth(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
-            const blacklist = [
-                {
-                    'form': 'SELECT * FROM register'
-                },
-                {
-                    'form': 'SELECT * FROM register WHERE id = ?'
-                },
-                {
-                    'form': '? OR 1=1'
-                },
-                {
-                    'form': 'INSERT INTO'
-                },
-                {
-                    'form': 'DROP TABLE register'
-                },
-                {
-                    'form': 'DROP TABLE products'
-                },
-                {
-                    'form': 'funcionou1234567'
-                },
-                {
-                    'form': 'adicionar o que quiser que funciona'
-                }
-            ];
-            for (let i = 0; i < blacklist.length; i++) {
-                if (req.body.email == blacklist[i].form || req.body.password == blacklist[i].form) {
-                    return res.status(500).json({ msg: 'Impossivel registrar agora. Tente novamente mais tarde.' });
-                }
+        });
+    }
+    create(req, res) {
+        return __awaiter(this, void 0, void 0, function* () {
+            let data = yield database_1.default.query("SELECT * FROM register WHERE email = ?", [req.body.email]);
+            if (Object.keys(data).length === 0) {
+                yield database_1.default.query("INSERT INTO register set ?", [req.body]);
+                res.status(200).json({ msg: 'Usuário Registrado' });
             }
-            const data = yield database_1.default.query("SELECT * FROM register WHERE email = ?", [
-                req.body.email,
-            ]);
-            if (data.length !== 0) {
-                if (yield bcrypt.compare(req.body.password, data[0].password)) {
-                    const token = jwt.sign({ id: data[0].id }, "d300a6359bff9592982a6ac996dab4ec", {
-                        //Lembrar de criar .env com esse MD5 Hash
-                        expiresIn: "1d",
-                    });
-                    const userData = {
-                        id: data[0].id,
-                        email: data[0].email,
-                        token,
-                    };
-                    return res.json({ msg: "Usuário Logado com Sucesso", userData }); //Será que userData é desnecessário?
-                }
-                else {
-                    res.status(404).json({ err: "Usuário não encontrado" }); //Utilizar esse padrão para não especificar que a senha que é incorreta
-                }
-                res.status(404).json({ err: "Usuário não encontrado" }); //Mesmo de acima
+            else if (Object.keys(data).length !== 0) {
+                res.status(422).json({ error: 'E-mail já cadastrado. Tente Logar.' });
+            }
+        });
+    }
+    logon(req, res) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const email = req.body.email;
+            const password = req.body.password;
+            if (!email) {
+                return res.status(422).json({ error: 'Email requerido' });
+            }
+            if (!password) {
+                return res.status(422).json({ error: "Password requerido" });
+            }
+            const data = yield database_1.default.query("SELECT * FROM register WHERE email = ?", [email]);
+            if (Object.keys(data).length === 0) {
+                res.status(200).json({ msg: 'Logon efetuado com sucesso' });
+            }
+            else {
+                res.status(422).json({ error: 'ERRO' });
             }
         });
     }

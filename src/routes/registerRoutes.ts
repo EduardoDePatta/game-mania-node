@@ -10,10 +10,10 @@ class RegisterRoutes {
     }
 
     config(): void {
-        this.router.get('/', registerController.logon)
+        this.router.post('/session', registerController.login)
         this.router.get('/', registerController.list);
         this.router.get('/:id', registerController.getOne);
-        this.router.post('/', registerController.create);
+        this.router.post('/', registerController.saveUser);
         this.router.delete('/:id', registerController.delete);
         this.router.put('/:id', registerController.update);
     }

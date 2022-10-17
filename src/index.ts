@@ -6,6 +6,7 @@ import indexRoutes from './routes/indexRoutes';
 import productsRoutes from './routes/productsRoutes';
 import registerRoutes from './routes/registerRoutes';
 
+
 class Server {
 
     URL = 'http://localhost:'
@@ -24,13 +25,13 @@ class Server {
         this.app.use(cors());
         this.app.use(express.json());
         this.app.use(express.urlencoded({extended: false}))
+        
     }
 
     routes(): void {
         this.app.use('/', indexRoutes);
         this.app.use('/api/products', productsRoutes);
-        this.app.use('/api/register', registerRoutes)
-
+        this.app.use('/api/register', registerRoutes);
     }
 
     start(): void {

@@ -15,6 +15,6 @@ CREATE TABLE products(
 CREATE TABLE register(
     id INT(11) NOT NULL AUTO_INCREMENT PRIMARY KEY,
     email varchar(255),
-    password char(16)
+    password VARCHAR(255)
 );
 
